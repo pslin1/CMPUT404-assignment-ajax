@@ -40,6 +40,7 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
                 if (xhr.status==200) {
                     //XXX: parse some JSON from the request!
                     //XXX: Pass the data to the callback!
+                    callback(xhr.responseText);
                 }
             } 
             catch(e) {
@@ -133,7 +134,7 @@ function getPosition(e) {
 	}
 }
 
-
+//This should use drawFrame because there will always be something to add
 function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
