@@ -87,29 +87,36 @@ def update(entity):
     data = flask_post_json()
     for key, value in data.items():
         myWorld.update(entity, key, value)
-    #How do we return the updated entity?
+    #How do we return the updated entity?**
     #https://stackoverflow.com/questions/34057851/python-flask-typeerror-dict-object-is-not-callable/34057946
     #Credit: davidism (https://stackoverflow.com/users/400617/davidism)
     return jsonify(myWorld.get(entity))
 
 #use myWorld.world()
-#NOTE NOTE NOTE NOTE: POST IS INCLUDED, IF POST DO UPDATE FIRST THEN RETURN
+#NOTE NOTE NOTE NOTE: POST IS INCLUDED, IF POST DO UPDATE FIRST THEN RETURN****confirm this
 @app.route("/world", methods=['POST','GET'])    
 def world():
     '''you should probably return the world here'''
+    #https://stackoverflow.com/questions/23974532/error-when-check-request-method-in-flask
+    # Credit: Martijn Peters (https://stackoverflow.com/users/100297/martijn-pieters)
+    if request.method == 'POST':
+        data = flask_post_json()
+        for i in data.items():
+            print(i)
     #Pretty sure this returns a JSON object too
-    return None
+    return jsonify(myWorld.world())
 
 @app.route("/entity/<entity>")    
 def get_entity(entity):
     '''This is the GET version of the entity interface, return a representation of the entity'''
     #I think this is supposed to return a JSON object?????*****
-    return None
+    return jsonify(myWorld.get(entity))
 
 @app.route("/clear", methods=['POST','GET'])
 def clear():
     '''Clear the world out!'''
-    return None
+    myWorld.clear()
+    return jsonify(myWorld.world())
 
 if __name__ == "__main__":
     app.run()
