@@ -93,16 +93,9 @@ def update(entity):
     return jsonify(myWorld.get(entity))
 
 #use myWorld.world()
-#NOTE NOTE NOTE NOTE: POST IS INCLUDED, IF POST DO UPDATE FIRST THEN RETURN****confirm this
 @app.route("/world", methods=['POST','GET'])    
 def world():
     '''you should probably return the world here'''
-    #https://stackoverflow.com/questions/23974532/error-when-check-request-method-in-flask
-    # Credit: Martijn Peters (https://stackoverflow.com/users/100297/martijn-pieters)
-    if request.method == 'POST':
-        data = flask_post_json()
-        for i in data.items():
-            print(i)
     #Pretty sure this returns a JSON object too
     return jsonify(myWorld.world())
 
