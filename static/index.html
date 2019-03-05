@@ -35,27 +35,27 @@ var H = canvas.height = window.innerHeight-50;
 //callback is what we do here when we receive a response back
 function sendJSONXMLHTTPRequest(url, objects, callback) {
     //console.log(callback);
-    var xhr = new XMLHttpRequest();
-    //console.log(xhr.status)
-    xhr.onreadystatechange = function () {
-        //NOTE: readyState == 4 after we call sendJSONXMLHTTPRequest in update??
-        if (xhr.readyState==4) {
-            try {
-                if (xhr.status==200) {
-                    //XXX: parse some JSON from the request!
-                    //XXX: Pass the data to the callback!
-                    //note that the xhr.responseText needs to be PARSED into an object so we can refresh the world
-                    //weird stuff happens and refreshWorld won't work proeprly if JSON is not parsed properly
-                    //http://webdocs.cs.ualberta.ca/~hindle1/2014/CMPUT404-AJAX-Slides/#/3
-                    //Credit: Abram Hindle
-                    callback(JSON.parse(xhr.responseText));
-                }
-            } 
-            catch(e) {
-                alert('Error: ' + e.name);
-            }
-        }
-    };
+    // var xhr = new XMLHttpRequest();
+    // //console.log(xhr.status)
+    // xhr.onreadystatechange = function () {
+    //     //NOTE: readyState == 4 after we call sendJSONXMLHTTPRequest in update??
+    //     if (xhr.readyState==4) {
+    //         try {
+    //             if (xhr.status==200) {
+    //                 //XXX: parse some JSON from the request!
+    //                 //XXX: Pass the data to the callback!
+    //                 //note that the xhr.responseText needs to be PARSED into an object so we can refresh the world
+    //                 //weird stuff happens and refreshWorld won't work proeprly if JSON is not parsed properly
+    //                 //http://webdocs.cs.ualberta.ca/~hindle1/2014/CMPUT404-AJAX-Slides/#/3
+    //                 //Credit: Abram Hindle
+    //                 callback(JSON.parse(xhr.responseText));
+    //             }
+    //         } 
+    //         catch(e) {
+    //             alert('Error: ' + e.name);
+    //         }
+    //     }
+    // };
     //XXX: POST to a URL
     //XXX: set the mimetype and the accept headers!
     // Remember to use application/json !
@@ -65,23 +65,25 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
     //MAY NEED OPTIMIZATION
     //https://stackoverflow.com/questions/6418220/javascript-send-json-object-with-ajax
     //Credit: Nathan Romano (https://stackoverflow.com/users/804091/nathan-romano)
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader("Content_Type", "application/json");
-    xhr.setRequestHeader("Accept", "application/json");
-    xhr.send(JSON.stringify(objects));
+    // xhr.open("POST", url, true);
+    // xhr.setRequestHeader("Content-Type", "application/json");
+    // xhr.setRequestHeader("Accept", "application/json");
+    // xhr.send(JSON.stringify(objects));
     //Note, fetch seems incompatible with the code we are given
     //https://stackoverflow.com/questions/46905051/fetch-api-post-request-response
     //Credit: bennygenel (https://stackoverflow.com/users/2315280/bennygenel)
-    // fetch(url, {
-    //     method: 'POST',
-    //     headers: {
-    //         'Accept': 'application/json',
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(objects)
-    // }).then(response => {
-    //     return response.json();
-    // })
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(objects)
+    }).then(response => {
+        return response.json();
+    }).then(jsonResponse => {
+        callback(jsonResponse);
+    })
 }
 
 
@@ -170,6 +172,7 @@ function addEntity(entity, data) {
     //will there sometimes not be a thing to draw when addEntity is called?
     if (data) {
         url = "/entity/" + entity; //this should cast as string
+        //entity is already in the URL (see example PUT in server.py)
         objects = data;
         //callback function cannot be null
         //https://www.dashingd3js.com/lessons/javascript-callback-functions
