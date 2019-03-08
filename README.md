@@ -29,4 +29,5 @@ https://medium.com/@jagadeshanh/html5-canvas-click-and-draw-f665e02f5744 <br>
 https://www.dashingd3js.com/lessons/javascript-callback-functions <br>
 https://stackoverflow.com/questions/14343812/redirecting-to-url-in-flask <br>
 https://stackoverflow.com/questions/34057851/python-flask-typeerror-dict-object-is-not-callable/34057946 <br>
+https://medium.com/beginners-guide-to-mobile-web-development/the-fetch-api-2c962591f5c <br>
 
