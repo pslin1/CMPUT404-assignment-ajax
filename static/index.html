@@ -31,45 +31,11 @@ var context = canvas.getContext("2d");
 var W = canvas.width  = window.innerWidth-6;
 var H = canvas.height = window.innerHeight-50;
 
-//objects should be the entities you're sending?
-//callback is what we do here when we receive a response back
 function sendJSONXMLHTTPRequest(url, objects, callback) {
-    //console.log(callback);
-    // var xhr = new XMLHttpRequest();
-    // //console.log(xhr.status)
-    // xhr.onreadystatechange = function () {
-    //     //NOTE: readyState == 4 after we call sendJSONXMLHTTPRequest in update??
-    //     if (xhr.readyState==4) {
-    //         try {
-    //             if (xhr.status==200) {
-    //                 //XXX: parse some JSON from the request!
-    //                 //XXX: Pass the data to the callback!
-    //                 //note that the xhr.responseText needs to be PARSED into an object so we can refresh the world
-    //                 //weird stuff happens and refreshWorld won't work proeprly if JSON is not parsed properly
-    //                 //http://webdocs.cs.ualberta.ca/~hindle1/2014/CMPUT404-AJAX-Slides/#/3
-    //                 //Credit: Abram Hindle
-    //                 callback(JSON.parse(xhr.responseText));
-    //             }
-    //         } 
-    //         catch(e) {
-    //             alert('Error: ' + e.name);
-    //         }
-    //     }
-    // };
     //XXX: POST to a URL
     //XXX: set the mimetype and the accept headers!
     // Remember to use application/json !
 
-    //can this ever be a GET/PUT??
-    //evrything in server.py accepts POST, this is safe
-    //MAY NEED OPTIMIZATION
-    //https://stackoverflow.com/questions/6418220/javascript-send-json-object-with-ajax
-    //Credit: Nathan Romano (https://stackoverflow.com/users/804091/nathan-romano)
-    // xhr.open("POST", url, true);
-    // xhr.setRequestHeader("Content-Type", "application/json");
-    // xhr.setRequestHeader("Accept", "application/json");
-    // xhr.send(JSON.stringify(objects));
-    //Note, fetch seems incompatible with the code we are given
     //https://stackoverflow.com/questions/46905051/fetch-api-post-request-response
     //Credit: bennygenel (https://stackoverflow.com/users/2315280/bennygenel)
     fetch(url, {
@@ -86,10 +52,20 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
     })
 }
 
-
 world = {};
 
 //XXX: TODO Make this prettier!
+
+//https://medium.com/@jagadeshanh/html5-canvas-click-and-draw-f665e02f5744
+//Credit: Jagadesh NH
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 function drawCircle(context,entity) {
     with(context) {
         beginPath();              
@@ -97,6 +73,7 @@ function drawCircle(context,entity) {
         var x = entity["x"];
         var y = entity["y"];
         //moveTo(x,y);
+        //Fun fact: setting fillStyle to getRandomColor() makes a dance party, it's a little obnoxious so I left it out
         fillStyle = entity["colour"];
         strokeStyle = fillStyle;
         arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
@@ -116,9 +93,8 @@ function prepEntity(entity) {
 
 function clearFrame() {
     with(context) {
-	moveTo(0,0);
-	fillStyle = "#000";
-	fillRect(0,0,W,H);
+	clearRect(0,0,W,H);
+
     }
 
 }
@@ -126,6 +102,7 @@ function clearFrame() {
 // This actually draws the frame
 function renderFrame() {
     clearFrame();
+
     for (var key in world) {
         var entity = world[key];
         drawCircle(context,prepEntity(entity));
@@ -176,9 +153,11 @@ function addEntity(entity, data) {
         objects = data;
         //callback function cannot be null
         //https://www.dashingd3js.com/lessons/javascript-callback-functions
+        //with reference to:
+        //https://stackoverflow.com/questions/21580544/cant-understand-this-javascript-code-with-callback-and-async
+        //Credit: Canna (https://stackoverflow.com/users/2673893/canna)
         sendJSONXMLHTTPRequest(url, objects, drawNextFrame);
     }
-    //drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
 
 }
@@ -289,36 +268,38 @@ mouse = (function() {
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+    addEntityWithoutName({'x':x,'y':y,'colour':getRandomColor()});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+    addEntityWithoutName({'x':x,'y':y,'colour':getRandomColor()});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
+    addEntityWithoutName({'x':x,'y':y,'colour':getRandomColor(),
                           'radius':10});
 });
 
 
 function update() {
     //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
-    //call sendJSONXMLHTTPRequest here, would objects be world?
-    //get world from server by going to URL world
-    //set world to 
-    //pray that xhr.resonseText returns the world
-    //if something breaks, check that
+    //get world from server and set the world to the new, updated world
     function refreshWorld(updatedWorld) {
         //recall that we can access world in here because scope
         world = updatedWorld;
         //trigger for drawFrame to draw stuff
         drawNextFrame();
-        //draw the world
+        //draw the updated world
         drawFrame();
     }
     url = "/world";
-    objects = world;
+    //we don't actually need any objects for this since we are just getting the world
+    //this is a slight optimization
+    objects = null;
+    //https://www.dashingd3js.com/lessons/javascript-callback-functions
+    //with reference to:
+    //https://stackoverflow.com/questions/21580544/cant-understand-this-javascript-code-with-callback-and-async
+    //Credit: Canna (https://stackoverflow.com/users/2673893/canna)
     sendJSONXMLHTTPRequest(url, objects, refreshWorld)
 }
 
